@@ -32,7 +32,7 @@ class MakePortFreeConfirmDialog extends StatelessWidget {
             Expanded(
               child: MaterialButton(
                 onPressed: () async {
-                  await CommonService.makePortAvailable(
+                  CommonService.makePortAvailable(
                     stationId,
                     portId,
                   );

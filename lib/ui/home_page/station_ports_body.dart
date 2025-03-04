@@ -26,7 +26,6 @@ class StationPortsBody extends StatelessWidget {
                 child: StationPortTile(
                   stationId: stationId,
                   id: ports[index].id,
-                  isBusy: data["is_busy"],
                   name: data["name"],
                   estimatedTime: data["estimated_time"],
                 ),

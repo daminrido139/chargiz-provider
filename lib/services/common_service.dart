@@ -3,14 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CommonService {
   static final _firestore = FirebaseFirestore.instance;
 
-  static Future<List<String>> fetchStations() async {
-    List<String> stations = [];
-    final docs =
-        await _firestore.collection('stations').orderBy("created_on").get();
-    for (var element in docs.docs) {
-      stations.add(element.id);
-    }
-    return stations;
+  static Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+      fetchStations() async {
+    return (await _firestore.collection('stations').orderBy("created_on").get())
+        .docs;
   }
 
   static Stream<QuerySnapshot<Map<String, dynamic>>> streamStationPorts(
@@ -25,26 +21,34 @@ class CommonService {
   }
 
   static Future<void> makePortAvailable(String stationId, String portId) async {
-    await _firestore
+    _firestore
         .collection('stations')
         .doc(stationId)
         .collection("ports")
         .doc(portId)
         .set(
-      {"is_busy": false, "estimated_time": null},
+      {"estimated_time": null},
+      SetOptions(merge: true),
+    );
+    _firestore.collection('stations').doc(stationId).set(
+      {"last_updated": Timestamp.now()},
       SetOptions(merge: true),
     );
   }
 
   static Future<void> makePortBusy(
       String stationId, String portId, Timestamp estimatedTime) async {
-    await _firestore
+    _firestore
         .collection('stations')
         .doc(stationId)
         .collection("ports")
         .doc(portId)
         .set(
-      {"is_busy": true, "estimated_time": estimatedTime},
+      {"estimated_time": estimatedTime},
+      SetOptions(merge: true),
+    );
+    _firestore.collection('stations').doc(stationId).set(
+      {"last_updated": Timestamp.now()},
       SetOptions(merge: true),
     );
   }

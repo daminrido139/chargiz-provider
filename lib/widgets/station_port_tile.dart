@@ -6,14 +6,12 @@ import 'package:flutter/material.dart';
 
 class StationPortTile extends StatelessWidget {
   final String id;
-  final bool isBusy;
   final String stationId;
   final String name;
   final Timestamp? estimatedTime;
   const StationPortTile({
     super.key,
     required this.id,
-    required this.isBusy,
     required this.name,
     required this.estimatedTime,
     required this.stationId,
@@ -32,16 +30,15 @@ class StationPortTile extends StatelessWidget {
             backgroundColor: Colors.grey.shade900,
             context: context,
             builder: (context) {
-              if (isBusy) {
+              if (estimatedTime != null) {
                 return MakePortFreeConfirmDialog(
                     stationId: stationId, portId: id);
-              } else {}
-
+              }
               return MakePortBusyConfirmDailog(
                   stationId: stationId, portId: id);
             });
       },
-      subtitle: isBusy
+      subtitle: (estimatedTime != null)
           ? Text(
               "Available in ${CommonService.foramtTimeLeft(estimatedTime!)}",
               style: TextStyle(color: Colors.red),

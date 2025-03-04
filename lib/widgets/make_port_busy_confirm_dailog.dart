@@ -75,7 +75,7 @@ class _MakePortBusyConfirmDailogState extends State<MakePortBusyConfirmDailog> {
             Expanded(
               child: MaterialButton(
                 onPressed: () async {
-                  await CommonService.makePortBusy(
+                  CommonService.makePortBusy(
                       widget.stationId,
                       widget.portId,
                       Timestamp.fromDate(
