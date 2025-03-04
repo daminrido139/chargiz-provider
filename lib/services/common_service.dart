@@ -1,0 +1,72 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class CommonService {
+  static final _firestore = FirebaseFirestore.instance;
+
+  static Future<List<String>> fetchStations() async {
+    List<String> stations = [];
+    final docs =
+        await _firestore.collection('stations').orderBy("created_on").get();
+    for (var element in docs.docs) {
+      stations.add(element.id);
+    }
+    return stations;
+  }
+
+  static Stream<QuerySnapshot<Map<String, dynamic>>> streamStationPorts(
+    String stationId,
+  ) {
+    return _firestore
+        .collection('stations')
+        .doc(stationId)
+        .collection("ports")
+        .orderBy("created_on")
+        .snapshots();
+  }
+
+  static Future<void> makePortAvailable(String stationId, String portId) async {
+    await _firestore
+        .collection('stations')
+        .doc(stationId)
+        .collection("ports")
+        .doc(portId)
+        .set(
+      {"is_busy": false, "estimated_time": null},
+      SetOptions(merge: true),
+    );
+  }
+
+  static Future<void> makePortBusy(
+      String stationId, String portId, Timestamp estimatedTime) async {
+    await _firestore
+        .collection('stations')
+        .doc(stationId)
+        .collection("ports")
+        .doc(portId)
+        .set(
+      {"is_busy": true, "estimated_time": estimatedTime},
+      SetOptions(merge: true),
+    );
+  }
+
+  static String foramtTimeLeft(Timestamp timestamp) {
+    DateTime targetTime = timestamp.toDate();
+    DateTime now = DateTime.now();
+    Duration difference = targetTime.difference(now);
+
+    if (difference.isNegative) {
+      return "Time's up";
+    }
+
+    int hours = difference.inHours;
+    int minutes = difference.inMinutes % 60;
+
+    if (hours > 0 && minutes > 0) {
+      return "$hours hr $minutes mins";
+    } else if (hours > 0) {
+      return "$hours hr";
+    } else {
+      return "$minutes mins";
+    }
+  }
+}
